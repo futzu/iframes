@@ -2,7 +2,10 @@
 Fast detection of  h.264 and h.265  keyframes in mpegts streams 
 
 ## Install
-
+* pip install new_reader
+```smalltalk
+python3 -mpip install new_reader
+```
 * git clone the repo
 
 ```smalltalk
@@ -12,7 +15,7 @@ git clone https://github.com/futzu/iframes
 ```smalltalk
 su -
 
-cd keyframes
+cd  iframes
 
 install iframes.py /usr/local/bin/iframes
 ```
