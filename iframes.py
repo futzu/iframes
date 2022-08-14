@@ -1,5 +1,6 @@
 import sys
 from functools import partial
+from new_reader import reader
 
 
 class IFramer:
@@ -88,7 +89,7 @@ class IFramer:
         do returns a list of the pts times of the iframes.
         """
         packet_size = 188
-        with open(vid,'rb') as video:
+        with reader(vid) as video:
             iframes = [self.parse(pkt) for pkt in iter(partial(video.read, packet_size), b"")]
             iframes = list(filter(None,iframes))
             print(iframes)
