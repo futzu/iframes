@@ -1,68 +1,99 @@
-#!/usr/bin/env python3
-
-"""
-keyframes.py
-"""
-
 import sys
 from functools import partial
-from threefive import Stream
 
-class KeyFramer(Stream):
+
+class IFramer:
     """
-    KeyFramer class
+    IFramer parses iframes from mpegts
     """
-
-    def __init__(self, tsdata, show_null=False):
+    
+    @staticmethod
+    def _abc_flags(pkt):
         """
-        tsdata is an file or http/https url or multicast url
+        0x80, 0x20, 0x8
         """
-        super().__init__(tsdata, show_null)
+        return pkt[5] & 0xA8
 
+    @staticmethod
+    def _afc_flag(pkt):
+        return pkt[3] & 0x20
+
+    @staticmethod
+    def _nal(pkt):
+        return b"\x00\x00\x01\x65" in pkt
+
+    @staticmethod
+    def _pcr_flag(pkt):
+        return pkt[5] & 0x10
+
+    @staticmethod
+    def _pts_flag(pay):
+        # uses pay not pkt
+        return pay[7] & 0x80
+
+    @staticmethod
+    def _pusi_flag(pkt):
+        return pkt[1] & 0x40
 
     @staticmethod
     def _rai_flag(pkt):
         return pkt[5] & 0x40
 
-    @staticmethod
-    def _ABC_flags(pkt):
-        """
-        0x80, 0x20, 0x8
-        """
-        return pkt[5] & 0xA8   
+    def _parse_payload(self, pkt):
+        head_size = 4
+        if self._afc_flag(pkt):
+            afl = pkt[4]
+            head_size += afl + 1  # +1 for afl byte
+        return pkt[head_size:]
 
+    def _parse_pts(self, pkt):
+        """
+        parse pts from pkt and store it
+        in the dict Stream._pid_pts.
+        """
+        payload = self._parse_payload(pkt)
+        if len(payload) < 14:
+            return
+        if self._pts_flag(payload):
+            pts = ((payload[9] >> 1) & 7) << 30
+            pts |= payload[10] << 22
+            pts |= (payload[11] >> 1) << 15
+            pts |= payload[12] << 7
+            pts |= payload[13] >> 1
+            return pts
 
     def _is_key(self, pkt):
         """
         _is_key is key frame detection.
-
         """
-        if b"\x00\x00\x01\x65" in pkt:
+        if self._nal(pkt):
             return True
         if not self._afc_flag(pkt):
             return False
         if self._pcr_flag(pkt):
-            if self._rai_flag(pkt):
+            if self. _rai_flag(pkt):
                 return True
-        if self._ABC_flags(pkt):
+        if self._abc_flags(pkt):
             return True
         return False
 
- 
-    def _parse(self, pkt):
-        """
-        _parse parses mpegts packets
-        """
-        pid = self._parse_info(pkt)
+    def parse(self,pkt):
         if self._pusi_flag(pkt):
-            self._parse_pts(pkt, pid)
             if self._is_key(pkt):
-                print(f"{self.pid2pts(pid):.6f}")
+                pts = self._parse_pts(pkt)
+                return round(pts/90000.0,6)
 
+    def do(self,vid):
+        """
+        do returns a list of the pts times of the iframes.
+        """
+        packet_size = 188
+        with open(vid,'rb') as video:
+            iframes = [self.parse(pkt) for pkt in iter(partial(video.read, packet_size), b"")]
+            iframes = list(filter(None,iframes))
+            print(iframes)
+            return iframes
 
-if __name__ == "__main__":
-    args = sys.argv[1:]
-    for arg in args:
-        print("src:",arg)
-        keyframer = KeyFramer(arg)
-        keyframer.decode()
+if __name__  == ' __main__':
+    iframer =IFramer()
+    iframer.do(sys.argv[1])
