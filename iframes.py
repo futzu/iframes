@@ -1,13 +1,29 @@
 import sys
 from functools import partial
-from new_reader import reader
+
+
+MAJOR = "0"
+MINOR = "0"
+MAINTAINENCE = "1"
+
+
+def version():
+    """
+    version prints version as a string
+
+    Odd number versions are releases.
+    Even number versions are testing builds between releases.
+
+    Used to set version in setup.py
+    and as an easy way to check which
+    version you have installed.
+
+    """
+    return f"{MAJOR}.{MINOR}.{MAINTAINENCE}"
 
 
 class IFramer:
-    """
-    IFramer parses iframes from mpegts
-    """
-    
+
     @staticmethod
     def _abc_flags(pkt):
         """
@@ -83,18 +99,21 @@ class IFramer:
             if self._is_key(pkt):
                 pts = self._parse_pts(pkt)
                 return round(pts/90000.0,6)
+        return None
 
     def do(self,vid):
-        """
-        do returns a list of the pts times of the iframes.
-        """
         packet_size = 188
-        with reader(vid) as video:
+        with open(vid,'rb') as video:
             iframes = [self.parse(pkt) for pkt in iter(partial(video.read, packet_size), b"")]
             iframes = list(filter(None,iframes))
             print(iframes)
             return iframes
 
-if __name__  == ' __main__':
+
+def cli():
     iframer =IFramer()
     iframer.do(sys.argv[1])
+
+
+if __name__  == ' __main__':
+    cli()
