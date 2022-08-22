@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import sys
 from functools import partial
-from new_reader import reader
+
 
 MAJOR = "0"
 MINOR = "0"
-MAINTAINENCE = "1"
+MAINTAINENCE = "3"
 
 
 def version():
@@ -95,18 +97,19 @@ class IFramer:
         return False
 
     def parse(self,pkt):
+        pts=None
         if self._pusi_flag(pkt):
             if self._is_key(pkt):
                 pts = self._parse_pts(pkt)
-                return round(pts/90000.0,6)
-        return None
+                pts= round(pts/90000.0,6)
+                print(pts)
+        return pts
 
     def do(self,vid):
         packet_size = 188
         with reader(vid) as video:
             iframes = [self.parse(pkt) for pkt in iter(partial(video.read, packet_size), b"")]
             iframes = list(filter(None,iframes))
-            print(iframes)
             return iframes
 
 
@@ -115,5 +118,6 @@ def cli():
     iframer.do(sys.argv[1])
 
 
-if __name__  == ' __main__':
-    cli()
+if __name__ == "__main__":
+
+   cli()
