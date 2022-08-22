@@ -15,6 +15,9 @@ setuptools.setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/futzu/iframes",
+    install_requires=[
+        "new_reader",
+    ],
     py_modules=["iframes"],
     scripts=['bin/iframes'],
     platforms="all",
