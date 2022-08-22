@@ -2,23 +2,11 @@
 Fast detection of iframes in mpegts streams 
 
 ## Install
-* pip install new_reader
+* pip install iframes
 ```smalltalk
 python3 -mpip install iframes
 ```
-* git clone the repo
 
-```smalltalk
-git clone https://github.com/futzu/iframes
-```
-* install
-```smalltalk
-su -
-
-cd  iframes
-
-install iframes.py /usr/local/bin/iframes
-```
 ## Run 
 * local file
 ```
