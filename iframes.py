@@ -25,7 +25,13 @@ def version():
 
 
 class IFramer:
-
+    def __init__(self,shush=False):
+        self.shush =shush
+    
+    @staticmethod
+    def _to90k(pts):
+        return round(pts/90000.0,6)
+        
     @staticmethod
     def _abc_flags(pkt):
         """
@@ -101,8 +107,10 @@ class IFramer:
         if self._pusi_flag(pkt):
             if self._is_key(pkt):
                 pts = self._parse_pts(pkt)
-                pts= round(pts/90000.0,6)
-                print(pts)
+                if pts:
+                    pts= self.to90k(pts)
+                    if not self.shush:
+                        print(pts)
         return pts
 
     def do(self,vid):
