@@ -108,7 +108,7 @@ class IFramer:
             if self._is_key(pkt):
                 pts = self._parse_pts(pkt)
                 if pts:
-                    pts= self.to90k(pts)
+                    pts= self._to90k(pts)
                     if not self.shush:
                         print(pts)
         return pts
