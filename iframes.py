@@ -2,11 +2,11 @@
 
 import sys
 from functools import partial
-
+from new_reader import reader
 
 MAJOR = "0"
 MINOR = "0"
-MAINTAINENCE = "3"
+MAINTAINENCE = "5"
 
 
 def version():
