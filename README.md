@@ -9,15 +9,26 @@ python3 -mpip install iframes
 
 ## Run 
 * local file
+```js
+first video.ts
 ```
+
+```js
 iframes video.ts
 ```
 * https
+```rebol
+first https://example.com/video.ts
 ```
+
+```rebol
 iframes https://example.com/video.ts
 ```
 * multicast
+```rebol
+first udp://@227.5.5.5:1234
 ```
+```rebol
 iframes udp://@227.5.5.5:1234
 ```
 ## Output
@@ -63,4 +74,17 @@ iframes udp://@227.5.5.5:1234
 14656.934433
 14657.184678
 14657.434933
+```
+### programmatically 
+
+```py3
+from iframes import IFramer
+ifrmr = IFramer()
+first_frame = ifrmr.first('a_video.ts')
+```
+
+```py3
+from iframes import IFramer
+ifrmr = IFramer(shush=True)  # set IFramer.shush=True to suppress printing pts 
+all_iframes = ifrmr.do('https://example.com/coolvideo.ts')
 ```
