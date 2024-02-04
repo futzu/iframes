@@ -6,7 +6,7 @@ from new_reader import reader
 
 MAJOR = "0"
 MINOR = "0"
-MAINTAINENCE = "7"
+MAINTAINENCE = "9"
 
 PKT_SIZE = 188
 
@@ -134,10 +134,12 @@ class IFramer:
         first returns the PTS of the first iframe.
         """
         with reader(vid) as video:
-             for pkt in self.iter_pkts(video):
-                pts = self.parse(pkt)
-                if pts is not None:
-                    return pts
+            while video:
+                pkt= video.read(PKT_SIZE)
+                if pkt:
+                    pts = self.parse(pkt)
+                    if pts:
+                        return pts
 
 
 def cli():
