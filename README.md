@@ -77,6 +77,18 @@ iframes udp://@227.5.5.5:1234
 ```
 ### programmatically 
 
+* What I've been doing lately is creating an IFramer instance and then call parse on each packet
+* if it returna a PTS value, it's an iframe. I do this in SuperKabuki to know where to insert SCTE-35 packets
+```py3
+from functools import partial
+
+for pkt in iter(partial(self._tsdata.read, self.PACKET_SIZE), b""):
+  pts = self.iframer.parse(pkt) 
+  if pts:
+      # do stuff
+```
+
+
 ```py3
 from iframes import IFramer
 ifrmr = IFramer()
